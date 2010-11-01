@@ -1,0 +1,4 @@
+Attempt to write pac-man game in Haskell.
+Written with HOpengl.
+For now it simply draws squares and nothing.
+
