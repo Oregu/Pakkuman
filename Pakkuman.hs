@@ -35,7 +35,10 @@ display = do
 	drawLevel
 	flush
 
-drawLevel = draw 0 level
+drawLevel :: IO ()
+drawLevel = do
+	level <- loadLevel
+	draw 0 level
 	where
 		draw n (Empty:r) = draw (succ n) r
 		draw n (h:r) = do
@@ -43,11 +46,15 @@ drawLevel = draw 0 level
 			draw (succ n) r
 		draw _ [] = return ()
 
-level :: [Sprite]
-level = [ Empty, Empty, Border, Empty, Empty, Border, Border, Empty, Border,
-			Empty, Border, Player, Empty, Empty, Border, Empty, Border, Border,
-			Border, Empty, Border, Empty, Empty, Border, Empty, Empty, Border,
-			Empty, Border, Player, Empty, Empty, Border, Empty, Border, Border ]
+loadLevel :: IO [Sprite]
+loadLevel = return [ Border, Border, Border, Border, Border, Border, Border, Border, Border
+					,Border, Player, Empty, Empty, Empty, Empty, Empty, Empty, Border
+					,Border, Empty, Border, Border, Border, Border, Border, Empty, Border
+					,Border, Empty, Border, Empty, Border, Empty, Empty, Empty, Border
+					,Border, Empty, Empty, Empty, Border, Empty, Border, Empty, Border
+					,Border, Empty, Border, Border, Border, Border, Border, Empty, Border
+					,Border, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Border
+					,Border, Border, Border, Border, Border, Border, Border, Border, Border ]
 
 spriteColor :: Sprite -> Color3 GLfloat
 spriteColor Empty = Color3 0 0 0
