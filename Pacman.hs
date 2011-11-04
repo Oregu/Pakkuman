@@ -1,5 +1,5 @@
 module Main where
 
-import Pacman (start)
+import qualified Pacman (start)
 
-main = start
+main = Pacman.start
