@@ -7,7 +7,7 @@ import Monad
 
 data Sprite = Empty | Border | Item | Player
 
-main = do
+start = do
 	(progname, _) <- getArgsAndInitialize
 	createWindow "Pacman World"
 	displayCallback $= display
