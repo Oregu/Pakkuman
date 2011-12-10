@@ -1,17 +1,22 @@
 module Pacman where
 
+import Keys (keyboardCallback)
+
 import Graphics.Rendering.OpenGL
 import Graphics.UI.GLUT
 import Random
 import Monad
+import Data.IORef
 
 data Sprite = Empty | Border | Item | Player
 
 start = do
 	(progname, _) <- getArgsAndInitialize
 	createWindow "Pacman World"
-	displayCallback $= display
+	pacmanPosition <- newIORef (1.0, 1.0)
+	displayCallback $= display (pacmanPosition)
 	reshapeCallback $= Just reshape
+	keyboardMouseCallback $= Just (keyboardCallback pacmanPosition)
 	mainLoop
 
 sceneSize :: GLfloat
@@ -30,9 +35,11 @@ reshape s@(Size w h) = do
 		then ortho2D 0 (border*aspect) border 0
 		else ortho2D 0 border (border/aspect) 0
 
-display = do
+display :: IORef (GLfloat, GLfloat) -> IO ()
+display pos = do
 	clear [ColorBuffer]
 	drawLevel
+	drawHero pos
 	flush
 
 drawLevel :: IO ()
@@ -46,9 +53,12 @@ drawLevel = do
 			draw (succ n) r
 		draw _ [] = return ()
 
+drawHero :: IORef (GLfloat, GLfloat) -> IO ()
+drawHero _ = return ()
+
 loadLevel :: IO [Sprite]
 loadLevel = return [ Border, Border, Border, Border, Border, Border, Border, Border, Border
-					,Border, Player, Empty, Empty, Empty, Empty, Empty, Empty, Border
+					,Border, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Border
 					,Border, Empty, Border, Border, Border, Border, Border, Empty, Border
 					,Border, Empty, Border, Empty, Border, Empty, Empty, Empty, Border
 					,Border, Empty, Empty, Empty, Border, Empty, Border, Empty, Border
@@ -87,3 +97,4 @@ drawSprite Player = do
 		vertex $ Vertex3 0 quadSize 0
 		vertex $ Vertex3 quadSize quadSize 0
 		vertex $ Vertex3 quadSize 0 0
+
