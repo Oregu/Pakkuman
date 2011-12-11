@@ -5,8 +5,12 @@ import System.Exit (exitWith, ExitCode(ExitSuccess))
 import Data.IORef
 
 keyboardCallback :: IORef (GLfloat, GLfloat) -> Key -> KeyState -> Modifiers -> Position -> IO()
-keyboardCallback _ (Char '\27') Down _ _ = exitWith ExitSuccess
-keyboardCallback pos (Char '+') Down _ _ = do
-	(x,y) <- get pos
-	pos $= (x,y+3)
+-- EXit keys
+keyboardCallback _ (Char '\ESC') Down _ _ = exitWith ExitSuccess
+-- Movement keys
+keyboardCallback pos (SpecialKey KeyRight) Down _ _ = modifyIORef pos (\(x,y) -> (x+1,y))
+keyboardCallback pos (SpecialKey KeyLeft) Down _ _ = modifyIORef pos (\(x,y) -> (x-1,y))
+keyboardCallback pos (SpecialKey KeyUp) Down _ _ = modifyIORef pos (\(x,y) -> (x,y-1))
+keyboardCallback pos (SpecialKey KeyDown) Down _ _ = modifyIORef pos (\(x,y) -> (x,y+1))
+-- Default
 keyboardCallback _ _ _ _ _ = return ()

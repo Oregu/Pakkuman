@@ -14,7 +14,8 @@ start = do
 	(progname, _) <- getArgsAndInitialize
 	createWindow "Pacman World"
 	pacmanPosition <- newIORef (1.0, 1.0)
-	displayCallback $= display (pacmanPosition)
+	displayCallback $= display pacmanPosition
+	idleCallback $= Just (display pacmanPosition)
 	reshapeCallback $= Just reshape
 	keyboardMouseCallback $= Just (keyboardCallback pacmanPosition)
 	mainLoop
@@ -54,7 +55,9 @@ drawLevel = do
 		draw _ [] = return ()
 
 drawHero :: IORef (GLfloat, GLfloat) -> IO ()
-drawHero _ = return ()
+drawHero p = do
+	(x,y) <- get p
+	drawSquare x y Player
 
 loadLevel :: IO [Sprite]
 loadLevel = return [ Border, Border, Border, Border, Border, Border, Border, Border, Border
