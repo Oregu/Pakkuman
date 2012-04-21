@@ -9,27 +9,22 @@ import Random
 import Monad
 import Data.IORef
 
-
+start :: IO ()
 start = do
 	(progname, _) <- getArgsAndInitialize
 	initialDisplayMode $= [DoubleBuffered]
 	createWindow "Pakkuman game"
 	gs <- newIORef defaultGameState
 	displayCallback $= display gs
-	idleCallback $= Just (display gs)
+	idleCallback $= Just (idle gs)
 	reshapeCallback $= Just reshape
 	keyboardMouseCallback $= Just (keyboardCallback gs)
 	mainLoop
 
-sceneSize :: GLfloat
-sceneSize = 60.0
-
-quadSize :: GLfloat
-quadSize = 3
-
 defaultGameState :: GameState
-defaultGameState = GameState {hero = Hero {pos = (1.0, 1.0)}, ghosts = []}
+defaultGameState = GameState {hero = Hero {pos = (1.0, 1.0), dir = DirIdle}, ghosts = []}
 
+reshape :: Size -> IO ()
 reshape s@(Size w h) = do
 	viewport $= (Position 0 0, s)
 	loadIdentity
@@ -42,12 +37,23 @@ reshape s@(Size w h) = do
 
 display :: IORef GameState -> IO ()
 display gs = do
-	GameState{hero = h} <- get gs
+	GameState {hero = h} <- get gs
 	clear [ColorBuffer]
 	drawLevel
 	drawHero h
 	swapBuffers
 	flush
+
+idle :: IORef GameState -> IO ()
+idle gsRef = do
+	modifyIORef gsRef updateGS
+	postRedisplay Nothing
+		where
+			updateGS GameState {hero = Hero {pos = (x, y), dir = DirUp}, ghosts = gs} = GameState {hero = Hero {pos = (x, y - heroSpeed), dir = DirUp}, ghosts = gs}
+			updateGS GameState {hero = Hero {pos = (x, y), dir = DirDown}, ghosts = gs} = GameState {hero = Hero {pos = (x, y + heroSpeed), dir = DirDown}, ghosts = gs}
+			updateGS GameState {hero = Hero {pos = (x, y), dir = DirLeft}, ghosts = gs} = GameState {hero = Hero {pos = (x - heroSpeed, y), dir = DirLeft}, ghosts = gs}
+			updateGS GameState {hero = Hero {pos = (x, y), dir = DirRight}, ghosts = gs} = GameState {hero = Hero {pos = (x + heroSpeed, y), dir = DirRight}, ghosts = gs}
+			updateGS gs = gs
 
 drawLevel :: IO ()
 drawLevel = do
