@@ -1,5 +1,6 @@
 module Pacman where
 
+import GameState
 import Keys (keyboardCallback)
 
 import Graphics.Rendering.OpenGL
@@ -8,16 +9,16 @@ import Random
 import Monad
 import Data.IORef
 
-data Sprite = Empty | Border | Item | Player
 
 start = do
 	(progname, _) <- getArgsAndInitialize
-	createWindow "Pacman World"
-	pacmanPosition <- newIORef (1.0, 1.0)
-	displayCallback $= display pacmanPosition
-	idleCallback $= Just (display pacmanPosition)
+	initialDisplayMode $= [DoubleBuffered]
+	createWindow "Pakkuman game"
+	gs <- newIORef defaultGameState
+	displayCallback $= display gs
+	idleCallback $= Just (display gs)
 	reshapeCallback $= Just reshape
-	keyboardMouseCallback $= Just (keyboardCallback pacmanPosition)
+	keyboardMouseCallback $= Just (keyboardCallback gs)
 	mainLoop
 
 sceneSize :: GLfloat
@@ -25,6 +26,9 @@ sceneSize = 60.0
 
 quadSize :: GLfloat
 quadSize = 3
+
+defaultGameState :: GameState
+defaultGameState = GameState {hero = Hero {pos = (1.0, 1.0)}, ghosts = []}
 
 reshape s@(Size w h) = do
 	viewport $= (Position 0 0, s)
@@ -36,11 +40,13 @@ reshape s@(Size w h) = do
 		then ortho2D 0 (border*aspect) border 0
 		else ortho2D 0 border (border/aspect) 0
 
-display :: IORef (GLfloat, GLfloat) -> IO ()
-display pos = do
+display :: IORef GameState -> IO ()
+display gs = do
+	GameState{hero = h} <- get gs
 	clear [ColorBuffer]
 	drawLevel
-	drawHero pos
+	drawHero h
+	swapBuffers
 	flush
 
 drawLevel :: IO ()
@@ -54,10 +60,16 @@ drawLevel = do
 			draw (succ n) r
 		draw _ [] = return ()
 
-drawHero :: IORef (GLfloat, GLfloat) -> IO ()
-drawHero p = do
-	(x,y) <- get p
-	drawSquare x y Player
+drawHero :: Hero -> IO ()
+drawHero Hero{pos = (x, y)} = do
+	color $ Color3 (0.8 :: GLfloat) 0.8 0.2
+	preservingMatrix $ do
+		translate $ Vector3 (x*quadSize) (y*quadSize :: GLfloat) 0
+		renderPrimitive Quads $ do
+			vertex $ Vertex3 (0::GLfloat) 0 0
+			vertex $ Vertex3 0 quadSize 0
+			vertex $ Vertex3 quadSize quadSize 0
+			vertex $ Vertex3 quadSize 0 0
 
 loadLevel :: IO [Sprite]
 loadLevel = return [ Border, Border, Border, Border, Border, Border, Border, Border, Border
@@ -72,8 +84,6 @@ loadLevel = return [ Border, Border, Border, Border, Border, Border, Border, Bor
 spriteColor :: Sprite -> Color3 GLfloat
 spriteColor Empty = Color3 0 0 0
 spriteColor Border = Color3 0 0 1
-spriteColor Item = Color3 0.2 0.2 0.2
-spriteColor Player = Color3 0.8 0.8 0.2
 
 drawSquare :: GLfloat -> GLfloat -> Sprite -> IO ()
 drawSquare x y sp =
@@ -82,9 +92,7 @@ drawSquare x y sp =
 		drawSprite sp
 
 drawSprite :: Sprite -> IO ()
-
 drawSprite Empty = return ()
-
 drawSprite Border = do
 	color $ spriteColor Border
 	renderPrimitive Quads $ do
@@ -92,12 +100,3 @@ drawSprite Border = do
 		vertex $ Vertex3 0 quadSize 0
 		vertex $ Vertex3 quadSize quadSize 0
 		vertex $ Vertex3 quadSize 0 0
-
-drawSprite Player = do
-	color $ spriteColor Player
-	renderPrimitive Quads $ do
-		vertex $ Vertex3 (0::GLfloat) 0 0
-		vertex $ Vertex3 0 quadSize 0
-		vertex $ Vertex3 quadSize quadSize 0
-		vertex $ Vertex3 quadSize 0 0
-
