@@ -6,7 +6,7 @@ import Keys (keyboardCallback)
 import Graphics.Rendering.OpenGL
 import Graphics.UI.GLUT
 import Random
-import Monad
+import Control.Monad
 import Data.IORef
 
 start :: IO ()
@@ -29,9 +29,9 @@ reshape s@(Size w h) = do
 	viewport $= (Position 0 0, s)
 	loadIdentity
 	let
-		aspect = realToFrac $ (fromIntegral w)/(fromIntegral h)
-		border = realToFrac $ (sceneSize)/2.0
-	if (w > h)
+		aspect = realToFrac $ fromIntegral w / fromIntegral h
+		border = realToFrac $ sceneSize/2.0
+	if w > h
 		then ortho2D 0 (border*aspect) border 0
 		else ortho2D 0 border (border/aspect) 0
 
@@ -101,8 +101,4 @@ drawSprite :: Sprite -> IO ()
 drawSprite Empty = return ()
 drawSprite Border = do
 	color $ spriteColor Border
-	renderPrimitive Quads $ do
-		vertex $ Vertex3 (0::GLfloat) 0 0
-		vertex $ Vertex3 0 quadSize 0
-		vertex $ Vertex3 quadSize quadSize 0
-		vertex $ Vertex3 quadSize 0 0
+	renderPrimitive Quads $ drawSprite Border
