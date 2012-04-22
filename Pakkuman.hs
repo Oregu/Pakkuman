@@ -49,10 +49,10 @@ idle gsRef = do
 	modifyIORef gsRef updateGS
 	postRedisplay Nothing
 		where
-			updateGS GameState {hero = Hero {pos = (x, y), dir = DirUp}, ghosts = gs} = GameState {hero = Hero {pos = (x, y - heroSpeed), dir = DirUp}, ghosts = gs}
-			updateGS GameState {hero = Hero {pos = (x, y), dir = DirDown}, ghosts = gs} = GameState {hero = Hero {pos = (x, y + heroSpeed), dir = DirDown}, ghosts = gs}
-			updateGS GameState {hero = Hero {pos = (x, y), dir = DirLeft}, ghosts = gs} = GameState {hero = Hero {pos = (x - heroSpeed, y), dir = DirLeft}, ghosts = gs}
-			updateGS GameState {hero = Hero {pos = (x, y), dir = DirRight}, ghosts = gs} = GameState {hero = Hero {pos = (x + heroSpeed, y), dir = DirRight}, ghosts = gs}
+			updateGS g@GameState {hero = h@Hero {pos = (x, y), dir = DirUp}} = g {hero = h {pos = (x, y - heroSpeed)}}
+			updateGS g@GameState {hero = h@Hero {pos = (x, y), dir = DirDown}} = g {hero = h {pos = (x, y + heroSpeed)}}
+			updateGS g@GameState {hero = h@Hero {pos = (x, y), dir = DirLeft}} = g {hero = h {pos = (x - heroSpeed, y)}}
+			updateGS g@GameState {hero = h@Hero {pos = (x, y), dir = DirRight}} = g {hero = h {pos = (x + heroSpeed, y)}}
 			updateGS gs = gs
 
 drawLevel :: IO ()

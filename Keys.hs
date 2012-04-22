@@ -11,15 +11,15 @@ keyboardCallback :: IORef GameState -> Key -> KeyState -> Modifiers -> Position 
 keyboardCallback _ (Char '\ESC') Down _ _ = exitWith ExitSuccess
 -- Movement keys
 keyboardCallback gs (SpecialKey KeyRight) Down _ _ =
-	modifyIORef gs (\(GameState {hero = Hero {pos = p, dir = _}, ghosts = g}) -> GameState {hero = Hero {pos = p, dir = DirRight}, ghosts = g})
+	modifyIORef gs (\g@GameState {hero = h} -> g {hero = h {dir = DirRight}})
 keyboardCallback gs (SpecialKey KeyLeft) Down _ _ =
-	modifyIORef gs (\(GameState {hero = Hero {pos = p, dir = _}, ghosts = g}) -> GameState {hero = Hero {pos = p, dir = DirLeft}, ghosts = g})
+	modifyIORef gs (\g@GameState {hero = h} -> g {hero = h {dir = DirLeft}})
 keyboardCallback gs (SpecialKey KeyUp) Down _ _ =
-	modifyIORef gs (\(GameState {hero = Hero {pos = p, dir = _}, ghosts = g}) -> GameState {hero = Hero {pos = p, dir = DirUp}, ghosts = g})
+	modifyIORef gs (\g@GameState {hero = h} -> g {hero = h {dir = DirUp}})
 keyboardCallback gs (SpecialKey KeyDown) Down _ _ =
-	modifyIORef gs (\(GameState {hero = Hero {pos = p, dir = _}, ghosts = g}) -> GameState {hero = Hero {pos = p, dir = DirDown}, ghosts = g})
+	modifyIORef gs (\g@GameState {hero = h} -> g {hero = h {dir = DirDown}})
 -- Stop key - temporarily
 keyboardCallback gs (Char ' ') Down _ _ =
-	modifyIORef gs (\(GameState {hero = Hero {pos = p, dir = _}, ghosts = g}) -> GameState {hero = Hero {pos = p, dir = DirIdle}, ghosts = g})
+	modifyIORef gs (\g@GameState {hero = h} -> g {hero = h {dir = DirIdle}})
 -- Default
 keyboardCallback _ _ _ _ _ = return ()
