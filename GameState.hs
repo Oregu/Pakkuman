@@ -18,3 +18,6 @@ sceneSize = 60.0
 
 quadSize :: GLfloat
 quadSize = 3
+
+cheeseheadRadius :: GLfloat
+cheeseheadRadius = 1.2

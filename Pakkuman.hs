@@ -67,7 +67,12 @@ drawLevel = do
 		draw _ [] = return ()
 
 drawHero :: Hero -> IO ()
-drawHero Hero{pos = (x, y)} = drawQuad x y (Color3 (0.8 :: GLfloat) 0.8 0.2)
+drawHero Hero{pos = (x, y)} = do
+	color $ Color3 (0.8 :: GLfloat) 0.8 0.2
+	preservingMatrix $ do
+		translate $ Vector3 (x*quadSize) (y*quadSize :: GLfloat) 0
+		renderPrimitive Polygon $ do
+			mapM_ (\angle -> vertex $ Vertex3 (cheeseheadRadius * cos angle) (cheeseheadRadius * sin angle) 0) [0, 0.01 .. 2*pi]
 
 loadLevel :: IO [Sprite]
 loadLevel = return [ Border, Border, Border, Border, Border, Border, Border, Border, Border
