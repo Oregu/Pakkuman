@@ -1,5 +1,5 @@
 CC=ghc
-SOURCES=Pacman.hs Pakkuman.hs Keys.hs
+SOURCES=Pacman.hs GameState.hs Pakkuman.hs Keys.hs
 EXECUTABLE=pakkuman
 
 all: pacman

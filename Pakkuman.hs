@@ -62,20 +62,12 @@ drawLevel = do
 	where
 		draw n (Empty:r) = draw (succ n) r
 		draw n (h:r) = do
-			drawSquare (fromIntegral $ n `rem` 9) (fromIntegral $ n `div` 9) h
+			drawSprite (fromIntegral $ n `rem` 9) (fromIntegral $ n `div` 9) h
 			draw (succ n) r
 		draw _ [] = return ()
 
 drawHero :: Hero -> IO ()
-drawHero Hero{pos = (x, y)} = do
-	color $ Color3 (0.8 :: GLfloat) 0.8 0.2
-	preservingMatrix $ do
-		translate $ Vector3 (x*quadSize) (y*quadSize :: GLfloat) 0
-		renderPrimitive Quads $ do
-			vertex $ Vertex3 (0::GLfloat) 0 0
-			vertex $ Vertex3 0 quadSize 0
-			vertex $ Vertex3 quadSize quadSize 0
-			vertex $ Vertex3 quadSize 0 0
+drawHero Hero{pos = (x, y)} = drawQuad x y (Color3 (0.8 :: GLfloat) 0.8 0.2)
 
 loadLevel :: IO [Sprite]
 loadLevel = return [ Border, Border, Border, Border, Border, Border, Border, Border, Border
@@ -87,18 +79,17 @@ loadLevel = return [ Border, Border, Border, Border, Border, Border, Border, Bor
 					,Border, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Border
 					,Border, Border, Border, Border, Border, Border, Border, Border, Border ]
 
-spriteColor :: Sprite -> Color3 GLfloat
-spriteColor Empty = Color3 0 0 0
-spriteColor Border = Color3 0 0 1
+drawSprite :: GLfloat -> GLfloat -> Sprite -> IO ()
+drawSprite _ _ Empty = return ()
+drawSprite x y Border = drawQuad x y (Color3 0 0 1)
 
-drawSquare :: GLfloat -> GLfloat -> Sprite -> IO ()
-drawSquare x y sp =
+drawQuad :: GLfloat -> GLfloat -> Color3 GLfloat -> IO ()
+drawQuad x y col = do
+	color col
 	preservingMatrix $ do
 		translate $ Vector3 (x*quadSize) (y*quadSize :: GLfloat) 0
-		drawSprite sp
-
-drawSprite :: Sprite -> IO ()
-drawSprite Empty = return ()
-drawSprite Border = do
-	color $ spriteColor Border
-	renderPrimitive Quads $ drawSprite Border
+		renderPrimitive Quads $ do
+			vertex $ Vertex3 (0::GLfloat) 0 0
+			vertex $ Vertex3 0 quadSize 0
+			vertex $ Vertex3 quadSize quadSize 0
+			vertex $ Vertex3 quadSize 0 0
