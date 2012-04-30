@@ -3,12 +3,12 @@ module Keys where
 import GameState
 
 import Graphics.UI.GLUT
-import System.Exit (exitWith, ExitCode(ExitSuccess))
+import System.Exit (exitSuccess)
 import Data.IORef
 
 keyboardCallback :: IORef GameState -> Key -> KeyState -> Modifiers -> Position -> IO()
 -- Exit keys
-keyboardCallback _ (Char '\ESC') Down _ _ = exitWith ExitSuccess
+keyboardCallback _ (Char '\ESC') Down _ _ = exitSuccess
 -- Movement keys
 keyboardCallback gs (SpecialKey KeyRight) Down _ _ =
 	modifyIORef gs (\g@GameState {hero = h} -> g {hero = h {dir = DirRight}})
