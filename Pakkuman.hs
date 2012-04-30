@@ -5,7 +5,6 @@ import Keys (keyboardCallback)
 
 import Graphics.Rendering.OpenGL
 import Graphics.UI.GLUT
-import Random
 import Control.Monad
 import Data.IORef
 
@@ -22,7 +21,7 @@ start = do
 	mainLoop
 
 defaultGameState :: GameState
-defaultGameState = GameState {hero = Hero {pos = (1.0, 1.0), dir = DirIdle}, ghosts = []}
+defaultGameState = GameState {hero = Hero {pos = (1.0, 1.0), dir = DirIdle, stamp = (0, 1)}, ghosts = []}
 
 reshape :: Size -> IO ()
 reshape s@(Size w h) = do
@@ -49,11 +48,16 @@ idle gsRef = do
 	modifyIORef gsRef updateGS
 	postRedisplay Nothing
 		where
-			updateGS g@GameState {hero = h@Hero {pos = (x, y), dir = DirUp}} = g {hero = h {pos = (x, y - heroSpeed)}}
-			updateGS g@GameState {hero = h@Hero {pos = (x, y), dir = DirDown}} = g {hero = h {pos = (x, y + heroSpeed)}}
-			updateGS g@GameState {hero = h@Hero {pos = (x, y), dir = DirLeft}} = g {hero = h {pos = (x - heroSpeed, y)}}
-			updateGS g@GameState {hero = h@Hero {pos = (x, y), dir = DirRight}} = g {hero = h {pos = (x + heroSpeed, y)}}
+			updateGS g@GameState {hero = h@Hero {pos = (x, y), stamp = s, dir = DirUp}} = g {hero = h {pos = (x, y - heroSpeed), stamp = hextHeroStamp s}}
+			updateGS g@GameState {hero = h@Hero {pos = (x, y), stamp = s, dir = DirDown}} = g {hero = h {pos = (x, y + heroSpeed), stamp = hextHeroStamp s}}
+			updateGS g@GameState {hero = h@Hero {pos = (x, y), stamp = s, dir = DirLeft}} = g {hero = h {pos = (x - heroSpeed, y), stamp = hextHeroStamp s}}
+			updateGS g@GameState {hero = h@Hero {pos = (x, y), stamp = s, dir = DirRight}} = g {hero = h {pos = (x + heroSpeed, y), stamp = hextHeroStamp s}}
 			updateGS gs = gs
+
+			hextHeroStamp (s, d)	| d == 1  && s < 6  = (s+1,  1)
+									| d == 1  && s == 6 = (  5, -1)
+									| d == -1 && s > 0  = (s-1, -1)
+									| otherwise = (1, 1)
 
 drawLevel :: IO ()
 drawLevel = do
@@ -67,12 +71,21 @@ drawLevel = do
 		draw _ [] = return ()
 
 drawHero :: Hero -> IO ()
-drawHero Hero{pos = (x, y)} = do
+drawHero Hero{pos = (x, y), stamp = (st, _), dir = d} = do
 	color $ Color3 (0.8 :: GLfloat) 0.8 0.2
 	preservingMatrix $ do
 		translate $ Vector3 (x*quadSize) (y*quadSize :: GLfloat) 0
+		rotate (angleFromDir d) $ Vector3 (0::GLfloat) 0 0
 		renderPrimitive Polygon $ do
-			mapM_ (\angle -> vertex $ Vertex3 (cheeseheadRadius * cos angle) (cheeseheadRadius * sin angle) 0) [0, 0.01 .. 2*pi]
+			vertex $ Vertex3 (0::GLfloat) 0 0
+			mapM_ (\angle -> vertex $ Vertex3 (cheeseheadRadius * cos angle) (cheeseheadRadius * sin angle) 0) [st*0.1, st*0.1 + 0.1 .. 2*pi-st*0.1]
+			vertex $ Vertex3 (0::GLfloat) 0 0
+	where
+		angleFromDir :: Dir -> GLfloat
+		angleFromDir DirUp = 270.0
+		angleFromDir DirLeft = 180.0
+		angleFromDir DirDown = 90.0
+		angleFromDir _ = 0.0
 
 loadLevel :: IO [Sprite]
 loadLevel = return [ Border, Border, Border, Border, Border, Border, Border, Border, Border
