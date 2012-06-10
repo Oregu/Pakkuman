@@ -21,4 +21,3 @@ Use **make** to create binary file. It will be **./pakkuman** for linux. You sho
 * Ghosts brains
 * Scoring
 * Splash screen/Game start/Game end
-

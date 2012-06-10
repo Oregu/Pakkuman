@@ -7,6 +7,7 @@ import Graphics.Rendering.OpenGL
 import Graphics.UI.GLUT
 import Control.Monad
 import Data.IORef
+import System.CPUTime
 
 start :: IO ()
 start = do
@@ -15,7 +16,7 @@ start = do
 	createWindow "Pakkuman game"
 	gs <- newIORef defaultGameState
 	displayCallback $= display gs
-	idleCallback $= Just (idle gs)
+	addTimerCallback 0 (update gs)
 	reshapeCallback $= Just reshape
 	keyboardMouseCallback $= Just (keyboardCallback gs)
 	mainLoop
@@ -43,10 +44,11 @@ display gs = do
 	swapBuffers
 	flush
 
-idle :: IORef GameState -> IO ()
-idle gsRef = do
+update :: IORef GameState -> IO ()
+update gsRef = do
 	modifyIORef gsRef updateGS
 	postRedisplay Nothing
+	addTimerCallback gameSpeed $ update gsRef
 		where
 			updateGS g@GameState {hero = h@Hero {pos = (x, y), stamp = s, dir = DirUp}} = g {hero = h {pos = (x, y - heroSpeed), stamp = hextHeroStamp s}}
 			updateGS g@GameState {hero = h@Hero {pos = (x, y), stamp = s, dir = DirDown}} = g {hero = h {pos = (x, y + heroSpeed), stamp = hextHeroStamp s}}
