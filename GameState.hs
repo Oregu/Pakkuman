@@ -11,10 +11,10 @@ data Ghost = Ghost
 data GameState = GameState {hero :: Hero, ghosts :: [Ghost]}
 
 gameSpeed :: Int
-gameSpeed = 40
+gameSpeed = 16
 
 heroSpeed :: GLfloat
-heroSpeed = 0.1
+heroSpeed = 0.05
 
 sceneSize :: GLfloat
 sceneSize = 60.0
@@ -23,4 +23,4 @@ quadSize :: GLfloat
 quadSize = 3
 
 cheeseheadRadius :: GLfloat
-cheeseheadRadius = 1.2
+cheeseheadRadius = 1.3

@@ -8,6 +8,7 @@ import Graphics.UI.GLUT
 import Control.Monad
 import Data.IORef
 import System.CPUTime
+import Data.Time.Clock (getCurrentTime, diffUTCTime)
 
 start :: IO ()
 start = do
@@ -46,9 +47,16 @@ display gs = do
 
 update :: IORef GameState -> IO ()
 update gsRef = do
+	startTime <- getCurrentTime
+
 	modifyIORef gsRef updateGS
 	postRedisplay Nothing
-	addTimerCallback gameSpeed $ update gsRef
+
+	endTime <- getCurrentTime
+	let timeSleep = if timeDiff < gameSpeed then gameSpeed - timeDiff else 0
+		where timeDiff = truncate (1000 * (diffUTCTime endTime startTime))
+
+	addTimerCallback timeSleep $ update gsRef
 		where
 			updateGS g@GameState {hero = h@Hero {pos = (x, y), stamp = s, dir = DirUp}} = g {hero = h {pos = (x, y - heroSpeed), stamp = hextHeroStamp s}}
 			updateGS g@GameState {hero = h@Hero {pos = (x, y), stamp = s, dir = DirDown}} = g {hero = h {pos = (x, y + heroSpeed), stamp = hextHeroStamp s}}
