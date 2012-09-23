@@ -7,6 +7,7 @@ import Graphics.Rendering.OpenGL
 import Graphics.UI.GLUT
 import Control.Monad
 import Data.IORef
+import System.IO
 import System.CPUTime
 import Data.Time.Clock (getCurrentTime, diffUTCTime)
 
@@ -15,6 +16,7 @@ start = do
 	(progname, _) <- getArgsAndInitialize
 	initialDisplayMode $= [DoubleBuffered]
 	createWindow "Pakkuman game"
+	windowSize $= Size 640 480
 	gs <- newIORef defaultGameState
 	displayCallback $= display gs
 	addTimerCallback 0 (update gs)
@@ -76,7 +78,7 @@ drawLevel = do
 	where
 		draw n (Empty:r) = draw (succ n) r
 		draw n (h:r) = do
-			drawSprite (fromIntegral $ n `rem` 9) (fromIntegral $ n `div` 9) h
+			drawSprite (fromIntegral $ n `rem` levelLength) (fromIntegral $ n `div` levelLength) h
 			draw (succ n) r
 		draw _ [] = return ()
 
@@ -98,14 +100,12 @@ drawHero Hero{pos = (x, y), stamp = (st, _), dir = d} = do
 		angleFromDir _ = 0.0
 
 loadLevel :: IO [Sprite]
-loadLevel = return [ Border, Border, Border, Border, Border, Border, Border, Border, Border
-					,Border, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Border
-					,Border, Empty, Border, Border, Border, Border, Border, Empty, Border
-					,Border, Empty, Border, Empty, Border, Empty, Empty, Empty, Border
-					,Border, Empty, Empty, Empty, Border, Empty, Border, Empty, Border
-					,Border, Empty, Border, Border, Border, Border, Border, Empty, Border
-					,Border, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Border
-					,Border, Border, Border, Border, Border, Border, Border, Border, Border ]
+loadLevel = readFile "level.1" >>= \s -> return $ foldr sprite [] s
+	where
+		sprite :: Char -> [Sprite] -> [Sprite]
+		sprite '-' spr = Border:spr
+		sprite ' ' spr =  Empty:spr
+		sprite  _  spr =        spr
 
 drawSprite :: GLfloat -> GLfloat -> Sprite -> IO ()
 drawSprite _ _ Empty = return ()
