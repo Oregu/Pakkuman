@@ -8,7 +8,7 @@ data Dir = DirIdle | DirUp | DirDown | DirLeft | DirRight
 data Hero = Hero {pos :: (GLfloat, GLfloat), dir :: Dir, stamp :: (Float, Int)}
 data Ghost = Ghost
 
-data GameState = GameState {hero :: Hero, ghosts :: [Ghost]}
+data GameState = GameState {hero :: Hero, ghosts :: [Ghost], level :: [Sprite]}
 
 gameSpeed :: Int
 gameSpeed = 16

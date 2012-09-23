@@ -18,15 +18,16 @@ start = do
 	initialDisplayMode $= [DoubleBuffered]
 	createWindow "Pakkuman game"
 	windowSize $= Size 640 480
-	gs <- newIORef defaultGameState
+	level <- loadLevel
+	gs <- newIORef $ defaultGameState level
 	displayCallback $= display gs
 	addTimerCallback 0 (update gs)
 	reshapeCallback $= Just reshape
 	keyboardMouseCallback $= Just (keyboardCallback gs)
 	mainLoop
 
-defaultGameState :: GameState
-defaultGameState = GameState {hero = Hero {pos = (1.0, 1.0), dir = DirIdle, stamp = (0, 1)}, ghosts = []}
+defaultGameState :: [Sprite] -> GameState
+defaultGameState level = GameState {hero = Hero {pos = (1.0, 1.0), dir = DirIdle, stamp = (0, 1)}, ghosts = [], level = level}
 
 reshape :: Size -> IO ()
 reshape s@(Size w h) = do
@@ -41,9 +42,9 @@ reshape s@(Size w h) = do
 
 display :: IORef GameState -> IO ()
 display gs = do
-	GameState {hero = h} <- get gs
+	GameState {hero = h, level = l} <- get gs
 	clear [ColorBuffer]
-	drawLevel
+	drawLevel l
 	drawHero h
 	swapBuffers
 	flush
@@ -72,9 +73,8 @@ update gsRef = do
 									| d == -1 && s > 0  = (s-1, -1)
 									| otherwise = (1, 1)
 
-drawLevel :: IO ()
-drawLevel = do
-	level <- loadLevel
+drawLevel :: [Sprite] -> IO ()
+drawLevel level = do
 	draw 0 level
 	where
 		draw n (Empty:r) = draw (succ n) r
