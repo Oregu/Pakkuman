@@ -3,7 +3,7 @@ module GameState where
 import Graphics.Rendering.OpenGL
 
 
-data Sprite = Empty | Bordr | VWall | HWall
+data Sprite = Empty | Bordr | VWall | HWall | UpLeft | UpRight | DownLeft | DownRight
 data Dir = DirIdle | DirUp | DirDown | DirLeft | DirRight
 data Hero = Hero {pos :: (GLfloat, GLfloat), dir :: Dir, stamp :: (Float, Int)}
 data Ghost = Ghost

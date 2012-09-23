@@ -106,11 +106,19 @@ loadLevel = readFile "level.1" >>= \s -> return $ foldr sprite [] s
 		sprite :: Char -> [Sprite] -> [Sprite]
 		sprite '-' spr = HWall:spr
 		sprite '|' spr = VWall:spr
+		sprite 'F' spr = UpLeft:spr
+		sprite '7' spr = UpRight:spr
+		sprite 'L' spr = DownLeft:spr
+		sprite 'J' spr = DownRight:spr
 		sprite ' ' spr = Empty:spr
 		sprite  _  spr =       spr
 
 drawSprite :: GLfloat -> GLfloat -> Sprite -> IO ()
-drawSprite x y HWall = drawHWall x y
-drawSprite x y VWall = drawVWall x y
-drawSprite x y Bordr = drawQuad x y
-drawSprite _ _ Empty = return ()
+drawSprite x y HWall     = drawHWall  x y
+drawSprite x y VWall     = drawVWall  x y
+drawSprite x y UpLeft    = drawUpLeft x y
+drawSprite x y UpRight   = drawUpRight x y
+drawSprite x y DownLeft  = drawDownLeft x y
+drawSprite x y DownRight = drawDownRight x y
+drawSprite x y Bordr     = drawSquare x y
+drawSprite _ _ Empty     = return ()
