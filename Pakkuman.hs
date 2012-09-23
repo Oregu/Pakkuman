@@ -1,6 +1,7 @@
 module Pacman where
 
 import GameState
+import Draw
 import Keys (keyboardCallback)
 
 import Graphics.Rendering.OpenGL
@@ -103,21 +104,13 @@ loadLevel :: IO [Sprite]
 loadLevel = readFile "level.1" >>= \s -> return $ foldr sprite [] s
 	where
 		sprite :: Char -> [Sprite] -> [Sprite]
-		sprite '-' spr = Border:spr
-		sprite ' ' spr =  Empty:spr
-		sprite  _  spr =        spr
+		sprite '-' spr = HWall:spr
+		sprite '|' spr = VWall:spr
+		sprite ' ' spr = Empty:spr
+		sprite  _  spr =       spr
 
 drawSprite :: GLfloat -> GLfloat -> Sprite -> IO ()
+drawSprite x y HWall = drawHWall x y
+drawSprite x y VWall = drawVWall x y
+drawSprite x y Bordr = drawQuad x y
 drawSprite _ _ Empty = return ()
-drawSprite x y Border = drawQuad x y (Color3 0 0 1)
-
-drawQuad :: GLfloat -> GLfloat -> Color3 GLfloat -> IO ()
-drawQuad x y col = do
-	color col
-	preservingMatrix $ do
-		translate $ Vector3 (x*quadSize) (y*quadSize :: GLfloat) 0
-		renderPrimitive Quads $ do
-			vertex $ Vertex3 (0::GLfloat) 0 0
-			vertex $ Vertex3 0 quadSize 0
-			vertex $ Vertex3 quadSize quadSize 0
-			vertex $ Vertex3 quadSize 0 0
