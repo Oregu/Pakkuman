@@ -10,6 +10,8 @@ data Ghost = Ghost
 
 data GameState = GameState {hero :: Hero, ghosts :: [Ghost], level :: [Sprite]}
 
+type Point2D = (GLfloat, GLfloat) 
+
 gameSpeed :: Int
 gameSpeed = 16
 
