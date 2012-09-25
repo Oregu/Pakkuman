@@ -22,13 +22,13 @@ sceneSize :: GLfloat
 sceneSize = 60.0
 
 quadSize :: GLfloat
-quadSize = 2
+quadSize = 1.0
 
 cheeseheadRadius :: GLfloat
-cheeseheadRadius = 0.8
+cheeseheadRadius = 0.6
 
 levelLength :: Int
-levelLength = 14
+levelLength = 28
 
 levelColor :: Color3 GLfloat
 levelColor = Color3 0 0 1

@@ -4,7 +4,7 @@ import GameState
 import Graphics.Rendering.OpenGL
 
 offset :: GLfloat
-offset = quadSize * 0.4
+offset = quadSize * 0.5
 
 drawSquare :: GLfloat -> GLfloat -> IO ()
 drawSquare x y = drawQuad x y [(0, 0), (0, quadSize), (quadSize, quadSize), (quadSize, 0)]

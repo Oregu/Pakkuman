@@ -17,7 +17,7 @@ start = do
 	(progname, _) <- getArgsAndInitialize
 	initialDisplayMode $= [DoubleBuffered]
 	createWindow "Pakkuman game"
-	windowSize $= Size 640 480
+	windowSize $= Size 540 580
 	level <- loadLevel
 	gs <- newIORef $ defaultGameState level
 	displayCallback $= display gs
