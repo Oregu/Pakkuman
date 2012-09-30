@@ -90,9 +90,9 @@ drawHero Hero{pos = (x, y), stamp = (st, _), dir = d} = do
 		translate $ Vector3 (x*quadSize) (y*quadSize :: GLfloat) 0
 		rotate (angleFromDir d) $ Vector3 (0::GLfloat) 0 1
 		renderPrimitive Polygon $ do
-			vertex $ Vertex3 (0::GLfloat) 0 0
+			vertex $ Vertex3 (-0.2::GLfloat) 0 0
 			mapM_ (\angle -> vertex $ Vertex3 (cheeseheadRadius * cos angle) (cheeseheadRadius * sin angle) 0) [st*0.1, st*0.1 + 0.1 .. 2*pi-st*0.1]
-			vertex $ Vertex3 (0::GLfloat) 0 0
+			vertex $ Vertex3 (-0.2::GLfloat) 0 0
 	where
 		angleFromDir :: Dir -> GLfloat
 		angleFromDir DirUp = 270.0

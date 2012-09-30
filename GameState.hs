@@ -16,7 +16,7 @@ gameSpeed :: Int
 gameSpeed = 16
 
 heroSpeed :: GLfloat
-heroSpeed = 0.05
+heroSpeed = 0.09
 
 sceneSize :: GLfloat
 sceneSize = 60.0
@@ -25,10 +25,10 @@ quadSize :: GLfloat
 quadSize = 1.0
 
 cheeseheadRadius :: GLfloat
-cheeseheadRadius = 0.6
+cheeseheadRadius = 0.8
 
 levelLength :: Int
 levelLength = 28
 
 levelColor :: Color3 GLfloat
-levelColor = Color3 0 0 1
+levelColor = Color3 0.13 0.13 0.87

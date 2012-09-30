@@ -19,19 +19,19 @@ drawVWall x y = drawLevelPiece x y $
 
 drawUpLeft :: GLfloat -> GLfloat -> IO ()
 drawUpLeft x y = drawLevelPiece x y $ do
-	drawLine [(offset, offset), (offset, quadSize), (offset, offset), (quadSize, offset)]
+	drawLine [(offset, quadSize), (offset, offset+0.1), (offset+0.1, offset), (quadSize, offset)]
 
 drawUpRight :: GLfloat -> GLfloat -> IO ()
 drawUpRight x y = drawLevelPiece x y $
-	drawLine [(0, offset), (offset, offset), (offset, offset), (offset, quadSize)]
+	drawLine [(0, offset), (offset-0.1, offset), (offset, offset+0.1), (offset, quadSize)]
 
 drawDownLeft :: GLfloat -> GLfloat -> IO ()
 drawDownLeft x y = drawLevelPiece x y $
-	drawLine [(offset, 0), (offset, offset), (offset, offset), (quadSize, offset)]
+	drawLine [(offset, 0), (offset, offset-0.1), (offset+0.1, offset), (quadSize, offset)]
 
 drawDownRight :: GLfloat -> GLfloat -> IO ()
 drawDownRight x y = drawLevelPiece x y $ do
-	drawLine [(offset, 0), (offset, offset), (offset, offset), (0, offset)]
+	drawLine [(offset, 0), (offset, offset-0.1), (offset-0.1, offset), (0, offset)]
 
 drawLevelPiece x y drawFunc = do
 	color levelColor
@@ -44,5 +44,5 @@ drawQuad x y ps = drawLevelPiece x y $ renderPrimitive Quads $
 	mapM_ (\(x, y) -> vertex $ Vertex3 x y 0) ps
 
 drawLine :: [Point2D] -> IO ()
-drawLine ps = renderPrimitive Lines $
+drawLine ps = renderPrimitive LineStrip $
 	mapM_ (\(x, y) -> vertex $ Vertex3 x y 0) ps
