@@ -5,18 +5,21 @@ import Graphics.Rendering.OpenGL
 
 data Sprite = Empty | Bordr | VWall | HWall | UpLeft | UpRight | DownLeft | DownRight
 data Dir = DirIdle | DirUp | DirDown | DirLeft | DirRight
-data Hero = Hero {pos :: (GLfloat, GLfloat), dir :: Dir, stamp :: (Float, Int)}
+data Hero = Hero {pos :: Point2D, dir :: Dir, stamp :: (Float, Int)}
 data Ghost = Ghost
 
 data GameState = GameState {hero :: Hero, ghosts :: [Ghost], level :: [Sprite]}
 
-type Point2D = (GLfloat, GLfloat) 
+type Point2D = (GLfloat, GLfloat)
 
 gameSpeed :: Int
 gameSpeed = 16
 
 heroSpeed :: GLfloat
 heroSpeed = 0.09
+
+heroStartPos :: Point2D
+heroStartPos = (14*quadSize, 23.5*quadSize)
 
 sceneSize :: GLfloat
 sceneSize = 60.0

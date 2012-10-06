@@ -28,7 +28,7 @@ start = do
 	mainLoop
 
 defaultGameState :: [Sprite] -> GameState
-defaultGameState level = GameState {hero = Hero {pos = (1.0, 1.0), dir = DirIdle, stamp = (0, 1)}, ghosts = [], level = level}
+defaultGameState level = GameState {hero = Hero {pos = heroStartPos, dir = DirIdle, stamp = (0, 1)}, ghosts = [], level = level}
 
 reshape :: Size -> IO ()
 reshape s@(Size w h) = do
