@@ -6,6 +6,20 @@ import Graphics.Rendering.OpenGL
 offset :: GLfloat
 offset = quadSize * 0.5
 
+class Drawable d where
+	draw :: d -> GLfloat -> GLfloat -> IO ()
+	draw d = drawSquare
+
+instance Drawable Sprite where
+	draw HWall     = drawHWall
+	draw VWall     = drawVWall
+	draw UpLeft    = drawUpLeft
+	draw UpRight   = drawUpRight
+	draw DownLeft  = drawDownLeft
+	draw DownRight = drawDownRight
+	draw Bordr     = drawSquare
+	draw Empty     = \x y -> return ()
+
 drawSquare :: GLfloat -> GLfloat -> IO ()
 drawSquare x y = drawQuad x y [(0, 0), (0, quadSize), (quadSize, quadSize), (quadSize, 0)]
 
@@ -31,7 +45,7 @@ drawDownLeft x y = drawLevelPiece x y $
 
 drawDownRight :: GLfloat -> GLfloat -> IO ()
 drawDownRight x y = drawLevelPiece x y $ do
-	drawLine [(offset, 0), (offset, offset-0.1), (offset-0.1, offset), (0, offset)]
+	drawLine [(0, offset), (offset-0.1, offset), (offset, offset-0.1), (offset, 0)]
 
 drawLevelPiece x y drawFunc = do
 	color levelColor

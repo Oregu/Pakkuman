@@ -12,6 +12,7 @@ import System.IO
 import System.CPUTime
 import Data.Time.Clock (getCurrentTime, diffUTCTime)
 
+
 start :: IO ()
 start = do
 	(progname, _) <- getArgsAndInitialize
@@ -75,13 +76,12 @@ update gsRef = do
 
 drawLevel :: [Sprite] -> IO ()
 drawLevel level = do
-	draw 0 level
+	draw' 0 level
 	where
-		draw n (Empty:r) = draw (succ n) r
-		draw n (h:r) = do
-			drawSprite (fromIntegral $ n `rem` levelLength) (fromIntegral $ n `div` levelLength) h
-			draw (succ n) r
-		draw _ [] = return ()
+		draw' n (h:r) = do
+			draw h (fromIntegral $ n `rem` levelLength) (fromIntegral $ n `div` levelLength)
+			draw' (succ n) r
+		draw' _ [] = return ()
 
 drawHero :: Hero -> IO ()
 drawHero Hero{pos = (x, y), stamp = (st, _), dir = d} = do
@@ -112,13 +112,3 @@ loadLevel = readFile "level.1" >>= \s -> return $ foldr sprite [] s
 		sprite 'J' spr = DownRight:spr
 		sprite ' ' spr = Empty:spr
 		sprite  _  spr =       spr
-
-drawSprite :: GLfloat -> GLfloat -> Sprite -> IO ()
-drawSprite x y HWall     = drawHWall  x y
-drawSprite x y VWall     = drawVWall  x y
-drawSprite x y UpLeft    = drawUpLeft x y
-drawSprite x y UpRight   = drawUpRight x y
-drawSprite x y DownLeft  = drawDownLeft x y
-drawSprite x y DownRight = drawDownRight x y
-drawSprite x y Bordr     = drawSquare x y
-drawSprite _ _ Empty     = return ()
