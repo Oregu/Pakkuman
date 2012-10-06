@@ -51,54 +51,33 @@ display gs = do
 	flush
 
 update :: IORef GameState -> IO ()
-update gsRef = do
+update gs = do
 	startTime <- getCurrentTime
 
-	modifyIORef gsRef updateGS
+	modifyIORef gs updateGS
 	postRedisplay Nothing
 
 	endTime <- getCurrentTime
 	let timeSleep = if timeDiff < gameSpeed then gameSpeed - timeDiff else 0
 		where timeDiff = truncate (1000 * (diffUTCTime endTime startTime))
 
-	addTimerCallback timeSleep $ update gsRef
-		where
-			updateGS g@GameState {hero = h@Hero {pos = (x, y), stamp = s, dir = DirUp}} = g {hero = h {pos = (x, y - heroSpeed), stamp = hextHeroStamp s}}
-			updateGS g@GameState {hero = h@Hero {pos = (x, y), stamp = s, dir = DirDown}} = g {hero = h {pos = (x, y + heroSpeed), stamp = hextHeroStamp s}}
-			updateGS g@GameState {hero = h@Hero {pos = (x, y), stamp = s, dir = DirLeft}} = g {hero = h {pos = (x - heroSpeed, y), stamp = hextHeroStamp s}}
-			updateGS g@GameState {hero = h@Hero {pos = (x, y), stamp = s, dir = DirRight}} = g {hero = h {pos = (x + heroSpeed, y), stamp = hextHeroStamp s}}
-			updateGS gs = gs
+	addTimerCallback timeSleep $ update gs
 
-			hextHeroStamp (s, d)	| d == 1  && s < 6  = (s+1,  1)
-									| d == 1  && s == 6 = (  5, -1)
-									| d == -1 && s > 0  = (s-1, -1)
-									| otherwise = (1, 1)
+updateGS :: GameState -> GameState
+updateGS g@GameState {hero = h@Hero {pos = (x, y), stamp = s, dir = DirUp}} = g {hero = h {pos = collide (x, y - heroSpeed), stamp = nextHeroStamp s}}
+updateGS g@GameState {hero = h@Hero {pos = (x, y), stamp = s, dir = DirDown}} = g {hero = h {pos = collide (x, y + heroSpeed), stamp = nextHeroStamp s}}
+updateGS g@GameState {hero = h@Hero {pos = (x, y), stamp = s, dir = DirLeft}} = g {hero = h {pos = collide (x - heroSpeed, y), stamp = nextHeroStamp s}}
+updateGS g@GameState {hero = h@Hero {pos = (x, y), stamp = s, dir = DirRight}} = g {hero = h {pos = collide (x + heroSpeed, y), stamp = nextHeroStamp s}}
+updateGS gs = gs
 
-drawLevel :: [Sprite] -> IO ()
-drawLevel level = do
-	draw' 0 level
-	where
-		draw' n (h:r) = do
-			draw h (fromIntegral $ n `rem` levelLength) (fromIntegral $ n `div` levelLength)
-			draw' (succ n) r
-		draw' _ [] = return ()
+nextHeroStamp :: (Float, Int) -> (Float, Int)
+nextHeroStamp (s, d) | d == 1  && s < 6  = (s+1,  1)
+					 | d == 1  && s == 6 = (  5, -1)
+					 | d == -1 && s > 0  = (s-1, -1)
+					 | otherwise = (1, 1)
 
-drawHero :: Hero -> IO ()
-drawHero Hero{pos = (x, y), stamp = (st, _), dir = d} = do
-	color $ Color3 (0.8 :: GLfloat) 0.8 0.2
-	preservingMatrix $ do
-		translate $ Vector3 (x*quadSize) (y*quadSize :: GLfloat) 0
-		rotate (angleFromDir d) $ Vector3 (0::GLfloat) 0 1
-		renderPrimitive Polygon $ do
-			vertex $ Vertex3 (-0.2::GLfloat) 0 0
-			mapM_ (\angle -> vertex $ Vertex3 (cheeseheadRadius * cos angle) (cheeseheadRadius * sin angle) 0) [st*0.1, st*0.1 + 0.1 .. 2*pi-st*0.1]
-			vertex $ Vertex3 (-0.2::GLfloat) 0 0
-	where
-		angleFromDir :: Dir -> GLfloat
-		angleFromDir DirUp = 270.0
-		angleFromDir DirLeft = 180.0
-		angleFromDir DirDown = 90.0
-		angleFromDir _ = 0.0
+collide :: Point2D -> Point2D
+collide (x, y) = (x, y)
 
 loadLevel :: IO [Sprite]
 loadLevel = readFile "level.1" >>= \s -> return $ foldr sprite [] s

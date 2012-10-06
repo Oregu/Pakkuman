@@ -12,6 +12,21 @@ data GameState = GameState {hero :: Hero, ghosts :: [Ghost], level :: [Sprite]}
 
 type Point2D = (GLfloat, GLfloat)
 
+class Boundable b where
+	minX :: b -> GLfloat
+	minY :: b -> GLfloat
+	maxX :: b -> GLfloat
+	maxY :: b -> GLfloat
+	minX _ = 0 :: GLfloat
+	minY = minX
+	maxX _ = quadSize
+	maxY = maxX
+
+instance Boundable Hero where
+	maxX _ = cheeseheadRadius * 2
+
+instance Boundable Sprite
+
 gameSpeed :: Int
 gameSpeed = 16
 
