@@ -79,6 +79,9 @@ nextHeroStamp (s, d) | d == 1  && s < 6  = (s+1,  1)
 collide :: Point2D -> Point2D
 collide (x, y) = (x, y)
 
+--point2tile :: Point2D -> Tile
+--point2tile (x, y) = (levelWidth * fromIntegral(x/quadSize), levelHeight * fromIntegral(y/quadSize))
+
 loadLevel :: IO [Sprite]
 loadLevel = readFile "level.1" >>= \s -> return $ foldr sprite [] s
 	where
