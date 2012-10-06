@@ -3,16 +3,15 @@ module Draw where
 import GameState
 import Graphics.Rendering.OpenGL hiding (Level)
 
-offset :: GLfloat
-offset = quadSize * 0.5
-
 class Drawable d where
 	draw :: d -> Point2D -> IO ()
 	draw _ p = drawQuad p [(0, 0), (0, quadSize), (quadSize, quadSize), (quadSize, 0)]
 
 instance Drawable Sprite where
-	draw HWall     p = drawPiece p $ drawLine [(0, offset), (quadSize, offset)]
-	draw VWall     p = drawPiece p $ drawLine [(offset, 0), (offset, quadSize)]
+	draw LWall     p = drawPiece p $ drawLine [(offset, 0), (offset, quadSize)]
+	draw RWall     p = drawPiece p $ drawLine [(offset, 0), (offset, quadSize)]
+	draw UWall     p = drawPiece p $ drawLine [(0, offset), (quadSize, offset)]
+	draw DWall     p = drawPiece p $ drawLine [(0, offset), (quadSize, offset)]
 	draw UpLeft    p = drawPiece p $ drawLine [(offset, quadSize), (offset, offset+0.1), (offset+0.1, offset), (quadSize, offset)]
 	draw UpRight   p = drawPiece p $ drawLine [(0, offset), (offset-0.1, offset), (offset, offset+0.1), (offset, quadSize)]
 	draw DownLeft  p = drawPiece p $ drawLine [(offset, 0), (offset, offset-0.1), (offset+0.1, offset), (quadSize, offset)]

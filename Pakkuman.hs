@@ -64,10 +64,10 @@ update gs = do
 	addTimerCallback timeSleep $ update gs
 
 updateGS :: GameState -> GameState
-updateGS g@GameState {hero = h@Hero {pos = (x, y), stamp = s, dir = DirUp}} = g {hero = h {pos = collide (x, y - heroSpeed), stamp = nextHeroStamp s}}
-updateGS g@GameState {hero = h@Hero {pos = (x, y), stamp = s, dir = DirDown}} = g {hero = h {pos = collide (x, y + heroSpeed), stamp = nextHeroStamp s}}
-updateGS g@GameState {hero = h@Hero {pos = (x, y), stamp = s, dir = DirLeft}} = g {hero = h {pos = collide (x - heroSpeed, y), stamp = nextHeroStamp s}}
-updateGS g@GameState {hero = h@Hero {pos = (x, y), stamp = s, dir = DirRight}} = g {hero = h {pos = collide (x + heroSpeed, y), stamp = nextHeroStamp s}}
+updateGS g@GameState {level = l, hero = h@Hero {pos = (x, y), stamp = s, dir = DirUp}} = g {hero = h {pos = collide l (x, y - heroSpeed), stamp = nextHeroStamp s}}
+updateGS g@GameState {level = l, hero = h@Hero {pos = (x, y), stamp = s, dir = DirDown}} = g {hero = h {pos = collide l (x, y + heroSpeed), stamp = nextHeroStamp s}}
+updateGS g@GameState {level = l, hero = h@Hero {pos = (x, y), stamp = s, dir = DirLeft}} = g {hero = h {pos = collide l (x - heroSpeed, y), stamp = nextHeroStamp s}}
+updateGS g@GameState {level = l, hero = h@Hero {pos = (x, y), stamp = s, dir = DirRight}} = g {hero = h {pos = collide l (x + heroSpeed, y), stamp = nextHeroStamp s}}
 updateGS gs = gs
 
 nextHeroStamp :: (Float, Int) -> (Float, Int)
@@ -76,18 +76,41 @@ nextHeroStamp (s, d) | d == 1  && s < 6  = (s+1,  1)
 					 | d == -1 && s > 0  = (s-1, -1)
 					 | otherwise = (1, 1)
 
-collide :: Point2D -> Point2D
-collide (x, y) = (x, y)
-
---point2tile :: Point2D -> Tile
---point2tile (x, y) = (levelWidth * fromIntegral(x/quadSize), levelHeight * fromIntegral(y/quadSize))
+collide :: [Sprite] -> Point2D -> Point2D
+collide level p@(x, y) = checkX . checkY $ p where
+	checkX (x, y) = if heroLeft >= quadSize * fromIntegral(tx - 1) + minX ltile &&
+				heroLeft < quadSize * fromIntegral(tx - 1) + maxX ltile
+				then (cheeseheadRadius + quadSize * fromIntegral(tx - 1) + maxX ltile, y)
+				else if heroRight > quadSize * fromIntegral(tx + 1) + minX rtile &&
+					heroRight <= quadSize * fromIntegral(tx + 1) + maxX rtile
+					then (quadSize * fromIntegral(tx + 1) - cheeseheadRadius + minX rtile, y)
+					else (x, y)
+	checkY (x, y) = if heroUp >= quadSize * fromIntegral(ty-1) + minY utile &&
+				heroUp < quadSize * fromIntegral(ty-1) + maxY utile
+				then (x, quadSize * fromIntegral(ty-1) + cheeseheadRadius + maxY utile)
+				else if heroDown > quadSize * fromIntegral(ty+1) + minY dtile &&
+					heroDown <= quadSize * fromIntegral(ty+1) + maxY dtile
+					then (x, quadSize * fromIntegral(ty+1) - cheeseheadRadius + minY dtile)
+					else (x, y)
+	(tx, ty) = point2tile (x, y)
+	left = ty * levelWidth + tx - 1
+	ltile = level !! left
+	rtile = level !! (left + 2)
+	utile = level !! (left - levelWidth + 1)
+	dtile = level !! (left + levelWidth + 1)
+	heroLeft = x - cheeseheadRadius
+	heroRight = x + cheeseheadRadius
+	heroUp = y - cheeseheadRadius
+	heroDown = y + cheeseheadRadius
 
 loadLevel :: IO [Sprite]
 loadLevel = readFile "level.1" >>= \s -> return $ foldr sprite [] s
 	where
 		sprite :: Char -> [Sprite] -> [Sprite]
-		sprite '-' spr = HWall:spr
-		sprite '|' spr = VWall:spr
+		sprite 'u' spr = UWall:spr
+		sprite 'd' spr = DWall:spr
+		sprite 'l' spr = LWall:spr
+		sprite 'r' spr = RWall:spr
 		sprite 'F' spr = UpLeft:spr
 		sprite '7' spr = UpRight:spr
 		sprite 'L' spr = DownLeft:spr
