@@ -4,6 +4,7 @@ import GameState
 import Draw
 import Keys (keyboardCallback)
 
+import Control.Applicative
 import Graphics.Rendering.OpenGL
 import Graphics.UI.GLUT
 import Data.IORef
@@ -103,7 +104,7 @@ collide lvl p@(x, y) = checkX . checkY $ p where
 	heroDown = y + cheeseheadRadius
 
 loadLevel :: IO [Sprite]
-loadLevel = readFile "level.1" >>= \s -> return $ foldr sprite [] s
+loadLevel = foldr sprite [] <$> readFile "level.1"
 	where
 		sprite :: Char -> [Sprite] -> [Sprite]
 		sprite 'u' spr = UWall:spr
