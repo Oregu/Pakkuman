@@ -5,7 +5,7 @@ import Graphics.Rendering.OpenGL
 
 data Sprite = Empty | Bordr | LWall | RWall | UWall | DWall | UpLeft | UpRight | DownLeft | DownRight
 data Dir = DirIdle | DirUp | DirDown | DirLeft | DirRight
-data Hero = Hero {pos :: Point2D, dir :: Dir, stamp :: (Float, Int)}
+data Hero = Hero {pos :: Point2D, dir :: Dir, stamp :: (GLfloat, Int)}
 data Ghost = Ghost
 
 data GameState = GameState {hero :: Hero, ghosts :: [Ghost], level :: [Sprite]}
@@ -50,14 +50,35 @@ tile2point (x, y) = (fromIntegral x*quadSize, fromIntegral y*quadSize)
 point2tile :: Point2D -> Tile
 point2tile (x, y) = (floor $ x/quadSize,  floor $ y/quadSize)
 
-gameSpeed = 16 :: Int
-heroSpeed = 0.09 :: GLfloat
+gameSpeed :: Int
+gameSpeed = 16
+
+heroSpeed :: GLfloat
+heroSpeed = 0.09
+
+heroStartPos :: (GLfloat, GLfloat)
 heroStartPos = (14*quadSize, 23.5*quadSize)
+
+sceneSize :: Double
 sceneSize = 60.0
+
+quadSize :: GLfloat
 quadSize = 1.0
+
+offset :: GLfloat
 offset = quadSize * 0.5
+
+cheeseheadRadius :: GLfloat
 cheeseheadRadius = 0.8
+
+levelColor :: Color3 GLfloat
 levelColor = Color3 0.13 0.13 0.87
+
+heroColor :: Color3 GLfloat
 heroColor = Color3 0.8 0.8 0.2
-levelWidth = 28 :: Int
-levelHeight = 31 :: Int
+
+levelWidth :: Int
+levelWidth = 28
+
+levelHeight :: Int
+levelHeight = 31

@@ -6,29 +6,26 @@ import Keys (keyboardCallback)
 
 import Graphics.Rendering.OpenGL
 import Graphics.UI.GLUT
-import Control.Monad
 import Data.IORef
-import System.IO
-import System.CPUTime
 import Data.Time.Clock (getCurrentTime, diffUTCTime)
 
 
 start :: IO ()
 start = do
-	(progname, _) <- getArgsAndInitialize
+	getArgsAndInitialize
 	initialDisplayMode $= [DoubleBuffered]
 	createWindow "Pakkuman game"
 	windowSize $= Size 540 580
-	level <- loadLevel
-	gs <- newIORef $ defaultGameState level
+	lvl <- loadLevel
+	gs <- newIORef $ defaultGameState lvl
 	displayCallback $= display gs
 	addTimerCallback 0 (update gs)
 	reshapeCallback $= Just reshape
-	keyboardMouseCallback $= Just (keyboardCallback gs)
+	keyboardMouseCallback $= Just (Keys.keyboardCallback gs)
 	mainLoop
 
 defaultGameState :: [Sprite] -> GameState
-defaultGameState level = GameState {hero = Hero {pos = heroStartPos, dir = DirIdle, stamp = (0, 1)}, ghosts = [], level = level}
+defaultGameState lvl = GameState {hero = Hero {pos = heroStartPos, dir = DirIdle, stamp = (0, 1)}, ghosts = [], level = lvl}
 
 reshape :: Size -> IO ()
 reshape s@(Size w h) = do
@@ -70,36 +67,36 @@ updateGS g@GameState {level = l, hero = h@Hero {pos = (x, y), stamp = s, dir = D
 updateGS g@GameState {level = l, hero = h@Hero {pos = (x, y), stamp = s, dir = DirRight}} = g {hero = h {pos = collide l (x + heroSpeed, y), stamp = nextHeroStamp s}}
 updateGS gs = gs
 
-nextHeroStamp :: (Float, Int) -> (Float, Int)
+nextHeroStamp :: (GLfloat, Int) -> (GLfloat, Int)
 nextHeroStamp (s, d) | d == 1  && s < 6  = (s+1,  1)
 					 | d == 1  && s == 6 = (  5, -1)
 					 | d == -1 && s > 0  = (s-1, -1)
 					 | otherwise = (1, 1)
 
 collide :: [Sprite] -> Point2D -> Point2D
-collide level p@(x, y) = checkX . checkY $ p where
+collide lvl p@(x, y) = checkX . checkY $ p where
 	checkX (x, y)
 		| heroLeft >= quadSize * fromIntegral(tx - 1) + minX ltile &&
 			heroLeft < quadSize * fromIntegral(tx - 1) + maxX ltile
-			= (cheeseheadRadius + quadSize * fromIntegral(tx - 1) + maxX ltile, y)
+		= (cheeseheadRadius + quadSize * fromIntegral(tx - 1) + maxX ltile, y)
 		| heroRight > quadSize * fromIntegral(tx + 1) + minX rtile &&
 			heroRight <= quadSize * fromIntegral(tx + 1) + maxX rtile
-			= (quadSize * fromIntegral(tx + 1) - cheeseheadRadius + minX rtile, y)
+		= (quadSize * fromIntegral(tx + 1) - cheeseheadRadius + minX rtile, y)
 		| otherwise = (x, y)
 	checkY (x, y)
 		| heroUp >= quadSize * fromIntegral(ty-1) + minY utile &&
 			heroUp < quadSize * fromIntegral(ty-1) + maxY utile
-			= (x, quadSize * fromIntegral(ty-1) + cheeseheadRadius + maxY utile)
+		= (x, quadSize * fromIntegral(ty-1) + cheeseheadRadius + maxY utile)
 		| heroDown > quadSize * fromIntegral(ty+1) + minY dtile &&
 			heroDown <= quadSize * fromIntegral(ty+1) + maxY dtile
-			= (x, quadSize * fromIntegral(ty+1) - cheeseheadRadius + minY dtile)
+		= (x, quadSize * fromIntegral(ty+1) - cheeseheadRadius + minY dtile)
 		| otherwise = (x, y)
 	(tx, ty) = point2tile (x, y)
 	left = ty * levelWidth + tx - 1
-	ltile = level !! left
-	rtile = level !! (left + 2)
-	utile = level !! (left - levelWidth + 1)
-	dtile = level !! (left + levelWidth + 1)
+	ltile = lvl !! left
+	rtile = lvl !! (left + 2)
+	utile = lvl !! (left - levelWidth + 1)
+	dtile = lvl !! (left + levelWidth + 1)
 	heroLeft = x - cheeseheadRadius
 	heroRight = x + cheeseheadRadius
 	heroUp = y - cheeseheadRadius

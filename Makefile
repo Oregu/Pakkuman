@@ -9,4 +9,4 @@ pacman:
 	$(CC) $(SRCDIR)/*.hs -odir $(OBJDIR) -o $(EXECUTABLE)
 
 clean:
-	rm -rf $(OBJDIR) $(EXECUTABLE)
+	rm -rf $(SRCDIR)/*.hi $(OBJDIR) $(EXECUTABLE)

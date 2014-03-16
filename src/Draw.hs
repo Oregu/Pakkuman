@@ -52,7 +52,7 @@ drawHero Hero{pos = (x, y), stamp = (st, _), dir = d} = do
 		angleFromDir _ = 0.0
 
 drawQuad :: Point2D -> [Point2D] -> IO ()
-drawQuad p@(x, y) ps = drawPiece p $ renderPrimitive Quads $
+drawQuad p ps = drawPiece p $ renderPrimitive Quads $
 	mapM_ (\(x, y) -> vertex $ Vertex3 x y 0) ps
 
 drawLine :: [Point2D] -> IO ()
