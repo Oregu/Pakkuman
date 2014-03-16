@@ -1,11 +1,12 @@
 CC=ghc
-SOURCES=Pacman.hs Pakkuman.hs GameState.hs Draw.hs Keys.hs
+SRCDIR := src
+OBJDIR := build
 EXECUTABLE=pakkuman
 
 all: pacman
 
 pacman:
-	$(CC) $(SOURCES) -o $(EXECUTABLE)
+	$(CC) $(SRCDIR)/*.hs -odir $(OBJDIR) -o $(EXECUTABLE)
 
 clean:
-	rm -rf *.o *.hi $(EXECUTABLE)
+	rm -rf $(OBJDIR) $(EXECUTABLE)
