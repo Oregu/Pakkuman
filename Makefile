@@ -9,4 +9,3 @@ pacman:
 
 clean:
 	rm -rf *.o *.hi $(EXECUTABLE)
-

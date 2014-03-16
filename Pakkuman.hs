@@ -59,7 +59,7 @@ update gs = do
 
 	endTime <- getCurrentTime
 	let timeSleep = if timeDiff < gameSpeed then gameSpeed - timeDiff else 0
-		where timeDiff = truncate (1000 * (diffUTCTime endTime startTime))
+		where timeDiff = truncate (1000 * diffUTCTime endTime startTime)
 
 	addTimerCallback timeSleep $ update gs
 
@@ -78,20 +78,22 @@ nextHeroStamp (s, d) | d == 1  && s < 6  = (s+1,  1)
 
 collide :: [Sprite] -> Point2D -> Point2D
 collide level p@(x, y) = checkX . checkY $ p where
-	checkX (x, y) = if heroLeft >= quadSize * fromIntegral(tx - 1) + minX ltile &&
-				heroLeft < quadSize * fromIntegral(tx - 1) + maxX ltile
-				then (cheeseheadRadius + quadSize * fromIntegral(tx - 1) + maxX ltile, y)
-				else if heroRight > quadSize * fromIntegral(tx + 1) + minX rtile &&
-					heroRight <= quadSize * fromIntegral(tx + 1) + maxX rtile
-					then (quadSize * fromIntegral(tx + 1) - cheeseheadRadius + minX rtile, y)
-					else (x, y)
-	checkY (x, y) = if heroUp >= quadSize * fromIntegral(ty-1) + minY utile &&
-				heroUp < quadSize * fromIntegral(ty-1) + maxY utile
-				then (x, quadSize * fromIntegral(ty-1) + cheeseheadRadius + maxY utile)
-				else if heroDown > quadSize * fromIntegral(ty+1) + minY dtile &&
-					heroDown <= quadSize * fromIntegral(ty+1) + maxY dtile
-					then (x, quadSize * fromIntegral(ty+1) - cheeseheadRadius + minY dtile)
-					else (x, y)
+	checkX (x, y)
+		| heroLeft >= quadSize * fromIntegral(tx - 1) + minX ltile &&
+			heroLeft < quadSize * fromIntegral(tx - 1) + maxX ltile
+			= (cheeseheadRadius + quadSize * fromIntegral(tx - 1) + maxX ltile, y)
+		| heroRight > quadSize * fromIntegral(tx + 1) + minX rtile &&
+			heroRight <= quadSize * fromIntegral(tx + 1) + maxX rtile
+			= (quadSize * fromIntegral(tx + 1) - cheeseheadRadius + minX rtile, y)
+		| otherwise = (x, y)
+	checkY (x, y)
+		| heroUp >= quadSize * fromIntegral(ty-1) + minY utile &&
+			heroUp < quadSize * fromIntegral(ty-1) + maxY utile
+			= (x, quadSize * fromIntegral(ty-1) + cheeseheadRadius + maxY utile)
+		| heroDown > quadSize * fromIntegral(ty+1) + minY dtile &&
+			heroDown <= quadSize * fromIntegral(ty+1) + maxY dtile
+			= (x, quadSize * fromIntegral(ty+1) - cheeseheadRadius + minY dtile)
+		| otherwise = (x, y)
 	(tx, ty) = point2tile (x, y)
 	left = ty * levelWidth + tx - 1
 	ltile = level !! left

@@ -27,11 +27,10 @@ drawPiece (x, y) drawFunc = do
 		drawFunc
 
 drawLevel :: [Sprite] -> IO ()
-drawLevel level = do
-	draw' 0 level
+drawLevel = draw' 0
 	where
 		draw' n (h:r) = do
-			draw h $ tile2point ((fromIntegral $ n `rem` levelWidth), (fromIntegral $ n `div` levelWidth))
+			draw h $ tile2point (fromIntegral $ n `rem` levelWidth, fromIntegral $ n `div` levelWidth)
 			draw' (succ n) r
 		draw' _ [] = return ()
 
